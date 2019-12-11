@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include <cblas.h>
 #include <lapacke.h>
@@ -46,6 +47,10 @@ void setParams(Matrix *M, int width, int height) {
   M->Yend = height - 1;
 }
 
+void clearMatrix(Matrix m) {
+  memset((void*)m.M, 0, m.width * m.height * sizeof(double));
+}
+
 double* access(Matrix M, int x, int y) {
   switch(M.type) {
     case COL_MAJOR: 
@@ -78,67 +83,74 @@ void identity(Matrix m) {
   }
 }
 
-void house(double *v, Matrix H) {
-  identity(H);
-  int size = H.Xend - H.Xstart + 1;
-  double norme = cblas_dnrm2(size, v, 1);
-  cblas_dger(CblasColMajor, size, size, -2./norme, v, 1, v, 1, H.M, H.height);
+void house(double *x, int size, double* v, double *beta) {
+  double theta = cblas_ddot(size - 1, &x[1], 1, &x[1], 1);
+
+  v[0] = 1.;
+  memcpy(&v[1], &x[1], (size-1)*sizeof(double));
+    
+  if(theta == 0) {
+    *beta = 0;
+  } else {
+    double nu = sqrt(x[0] * x[0] + theta);
+    if(x[0] <= 0) {
+      v[0] = x[0] - nu;
+    } else {
+      v[0] = -theta / (x[0] + nu);
+    }
+    double tmp = v[0]*v[0];
+    *beta = 2*tmp / (theta + tmp);
+    cblas_dscal(size, 1./v[0], v, 1);
+  }
 }
 
 void bidiag(Matrix A, Matrix B) {
   memcpy(B.M, A.M, B.width * B.height * sizeof(double));
 
-  Matrix H, vvt, Bvvt, BvvtA, sB;
-  initMatrix(&H    , B.height, B.height, COL_MAJOR);
-  initMatrix(&vvt  , B.height, B.height, COL_MAJOR);
+  Matrix Bvvt, BvvtA, sB;
   initMatrix(&Bvvt , B.height, B.height, COL_MAJOR);
   initMatrix(&BvvtA, B.height, B.height, COL_MAJOR);
 
 
-  double *v = NULL;
+  double *x = NULL, *v = (double*)malloc(B.height * sizeof(double));
+  double beta;
   
   int size;
 
   for(int j = 0; j < B.width; j++) {
-    v = access(B, j, j);
-  
+    x = access(B, j, j);
+    
     size = B.height - j;
 
-    setParams(&H    , size, size);
-    setParams(&vvt  , size, size);
     setParams(&Bvvt , size, size);
     setParams(&BvvtA, B.width - j, size);
 
     initSubMatrix(B, &sB, j, B.width-1, j, B.height-1);
 
-    house(v, H); 
-    printMat(H);
+    house(x, size, v, &beta);
 
-    cblas_dger(CblasColMajor, size, size, -1., v, 1, v, 1, vvt.M, size);
-    printMat(vvt);
+    cblas_dger(CblasColMajor, size, size, -beta, v, 1, v, 1, Bvvt.M, size);
   
-
-
-    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, size, size, size, -1., H.M, size, vvt.M, size, 0., Bvvt.M, size);
-    printMat(Bvvt);
-
     for(int i = 0; i < size; i++) {
       *access(Bvvt, i, i) += 1.;
     }
-    printMat(Bvvt);
 
     cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, size, sB.Xend - sB.Xstart + 1, size, 1., Bvvt.M, size, access(sB, 0, 0), sB.height, 0., BvvtA.M, size);
-    printMat(BvvtA);
 
 
-    for(int x = 0; x < BvvtA.width; x++) {
-      memcpy(access(sB, x, 0), access(BvvtA, x, 0), size*sizeof(double));
+    for(int i = 0; i < BvvtA.width; i++) {
+      memcpy(access(sB, i, 0), access(BvvtA, i, 0), size*sizeof(double));
     }
-    printMat(B);
 
-    memcpy(access(B, j, j+1), &v[1], (size - j)*sizeof(double));
-    printMat(B);
+    memcpy(access(B, j, j+1), &x[1], (size - j)*sizeof(double));
+
+    clearMatrix(Bvvt);
+    clearMatrix(BvvtA);
   }
+
+  free(v);
+  free(Bvvt.M);
+  free(BvvtA.M);
 }
 
 
@@ -185,6 +197,9 @@ int main(int argc, char** argv) {
   bidiag(A, B);
 
   printMat(B);
+
+  free(A.M);
+  free(B.M);
 
   exit(0);
 }
