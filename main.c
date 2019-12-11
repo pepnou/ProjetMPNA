@@ -112,7 +112,9 @@ void bidiag(Matrix A, Matrix B) {
   initMatrix(&BvvtA, B.height, B.height, COL_MAJOR);
 
 
-  double *x = NULL, *v = (double*)malloc(B.height * sizeof(double));
+  double *x  = NULL, 
+         *v  = (double*)malloc(B.height * sizeof(double)),
+         *xt = (double*)malloc(B.width  * sizeof(double));
   double beta;
   
   int size;
@@ -141,14 +143,47 @@ void bidiag(Matrix A, Matrix B) {
     for(int i = 0; i < BvvtA.width; i++) {
       memcpy(access(sB, i, 0), access(BvvtA, i, 0), size*sizeof(double));
     }
+    
+    // ????
+    //memcpy(access(B, j, j+1), &x[1], (size - j)*sizeof(double));
 
-    memcpy(access(B, j, j+1), &x[1], (size - j)*sizeof(double));
+    clearMatrix(Bvvt);
+    clearMatrix(BvvtA);
+
+
+    if(j < B.width - 2) {
+      size = B.width - j - 1;
+
+      setParams(&Bvvt , size, size);
+      setParams(&BvvtA, size, B.height - j);
+
+      initSubMatrix(B, &sB, j + 1, B.width-1, j, B.height-1);
+
+      cblas_dcopy(size, access(B, j+1, j), B.height, xt, 1);
+      house(xt, size, v, &beta);
+
+      cblas_dger(CblasColMajor, size, size, -beta, v, 1, v, 1, Bvvt.M, size);
+
+      for(int i = 0; i < size; i++) {
+        *access(Bvvt, i, i) += 1.;
+      }
+
+      cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, sB.Yend - sB.Ystart + 1, size, size, 1., access(sB, 0, 0), sB.height, Bvvt.M, size, 0., BvvtA.M, sB.Yend - sB.Ystart + 1);
+
+      for(int i = 0; i < BvvtA.width; i++) {
+        memcpy(access(sB, i, 0), access(BvvtA, i, 0), BvvtA.height*sizeof(double));
+      }
+      
+      // ?????
+      //cblas_dcopy(size - 1, &v[1], 1, access(B, j+2, j), B.height);
+    }
 
     clearMatrix(Bvvt);
     clearMatrix(BvvtA);
   }
 
   free(v);
+  free(xt);
   free(Bvvt.M);
   free(BvvtA.M);
 }
@@ -156,31 +191,7 @@ void bidiag(Matrix A, Matrix B) {
 
 
 int main(int argc, char** argv) {
-  /*Matrix M;
-  initMatrix(&M, 5, 5, COL_MAJOR);
-  for(int i = 0; i < 5; i++) {
-    for(int j = 0; j < 5; j++) {
-      *access(M, i, j) = i*5+j;
-    }
-  }
-  printMat(M);
-
-  Matrix sM;
-  initSubMatrix(M, &sM, 1, 3, 0, 4);
-  printMat(sM);
-
-  Matrix c;
-  initMatrix(&c, 3, 5, COL_MAJOR);
-
-  double alpha = 1.0, beta = 0.;
-  int m = c.height, n = c.width, k = 5;
-  int lda = M.height, ldb = sM.height, ldc = c.height;
-
-  cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, access(M, 0, 0), lda, access(sM, 0, 0), ldb, beta, access(c, 0, 0), ldc);
-
-  printMat(c);*/
-
-  int m = 3, n = 2;
+  int m = 4, n = 3;
 
   Matrix A, B;
   initMatrix(&A, n, m, COL_MAJOR);
@@ -188,7 +199,7 @@ int main(int argc, char** argv) {
 
   for(int i = 0; i < n; i++) {
     for(int j = 0; j < m; j++) {
-      *access(A, i, j) = i + j*n;
+      *access(A, i, j) = i+1 + j*n;
     }
   }
 
