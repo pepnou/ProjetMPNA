@@ -144,14 +144,13 @@ void bidiag(Matrix A, Matrix B) {
       memcpy(access(sB, i, 0), access(BvvtA, i, 0), size*sizeof(double));
     }
     
-    // ????
-    //memcpy(access(B, j, j+1), &x[1], (size - j)*sizeof(double));
+    //memcpy(access(B, j, j+1), &v[1], (size - 1)*sizeof(double));
 
     clearMatrix(Bvvt);
     clearMatrix(BvvtA);
 
 
-    if(j < B.width - 2) {
+    if(j < B.width - 1) {
       size = B.width - j - 1;
 
       setParams(&Bvvt , size, size);
@@ -174,7 +173,6 @@ void bidiag(Matrix A, Matrix B) {
         memcpy(access(sB, i, 0), access(BvvtA, i, 0), BvvtA.height*sizeof(double));
       }
       
-      // ?????
       //cblas_dcopy(size - 1, &v[1], 1, access(B, j+2, j), B.height);
     }
 
@@ -189,28 +187,46 @@ void bidiag(Matrix A, Matrix B) {
 }
 
 
-
-int main(int argc, char** argv) {
-  int m = 4, n = 3;
-
-  Matrix A, B;
-  initMatrix(&A, n, m, COL_MAJOR);
-  initMatrix(&B, n, m, COL_MAJOR);
-
-  for(int i = 0; i < n; i++) {
-    for(int j = 0; j < m; j++) {
-      *access(A, i, j) = i+1 + j*n;
-    }
-  }
-
-  printMat(A);
+void SVD(Matrix A, Matrix U, Matrix V) {
+  Matrix B, T;
+  initMatrix(&B, A.width, A.height, A.type);
+  initMatrix(&T, B.width, B.width, A.type);
 
   bidiag(A, B);
 
+
+  
+  printMat(A);
   printMat(B);
 
-  free(A.M);
+
+  cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, B.width, B.width, B.height, 1., access(B, 0, 0), B.height, access(B, 0, 0), B.height, 0., access(T, 0, 0), T.height);
+
+  printMat(T);
+
   free(B.M);
+  free(T.M);
+}
+
+
+int main(int argc, char** argv) {
+  int m = 5, n = 5;
+
+  Matrix A, U, V;
+  initMatrix(&A, n, m, COL_MAJOR);
+
+  srand(0);
+
+  for(int i = 0; i < n; i++) {
+    for(int j = 0; j < m; j++) {
+      //*access(A, i, j) = i+1 + j*n;
+      *access(A, i, j) = rand() % 100;
+    }
+  }
+
+  SVD(A, U, V);
+
+  free(A.M);
 
   exit(0);
 }
