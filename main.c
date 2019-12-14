@@ -186,6 +186,79 @@ void bidiag(Matrix A, Matrix B) {
   free(BvvtA.M);
 }
 
+void givens(double a, double b, double *c, double *s) {
+  if( b == 0 ) {
+    *c = 1;
+    *s = 0;
+  } else {
+    if( abs(b) > abs(a) ) {
+      double tau = -a / b;
+      *s = 1 / sqrt(1 + tau * tau);
+      *c = *s * tau;
+    } else {
+      double tau = -b / a;
+      *c = 1 / sqrt(1 + tau * tau);
+      *s = *c * tau;
+    }
+  }
+}
+
+double sign(double a) {
+  if( a < 0 ) {
+    return -1;
+  } else {
+    return 1;
+  }
+}
+
+void applyGivensLeft(Matrix T, int i, int k, double c, double s) {
+  for(int j = 0; j < T.width; j++) {
+    double tau1 = *access(T, j, i);
+    double tau2 = *access(T, j, k);
+
+    *access(T, j, 1) = c * tau1 - s * tau2;
+    *access(T, j, 2) = s * tau1 + c * tau2;
+  }
+}
+
+void applyGivensRight(Matrix T, int i, int k, double c, double s) {
+  for(int j = 0; j < T.height; j++) {
+    double tau1 = *access(T, i, j);
+    double tau2 = *access(T, k, j);
+
+    *access(T, i, j) = c * tau1 - s * tau2;
+    *access(T, k, j) = s * tau1 + c * tau2;
+  }
+}
+
+
+void QR(Matrix T) {
+  double TNN     = *access(T, T.width - 1, T.height - 1),
+         TNNM1   = *access(T, T.width - 2, T.height - 1),
+         //TNM1N   = *access(T, T.width - 1, T.height - 2),
+         TNM1NM1 = *access(T, T.width - 2, T.height - 2);
+
+
+  double d = ( TNM1NM1 - TNN ) / 2;
+  double mu = TNN - TNNM1 * TNNM1 / ( d + sign(d) * sqrt(d*d + TNNM1 * TNNM1) );
+
+  double x = *access(T, 0, 0) - mu;
+  double z = *access(T, 0, 1);
+
+  double c, s;
+
+  for(int k = 0; k < T.width - 1; k++) {
+    givens(x, z, &c, &s);
+
+    applyGivensLeft(T , k, k+1, c, s);
+    applyGivensRight(T, k, k+1, c, s);
+    
+    if(k < T.width - 2) {
+      x = *access(T, k, k+1);
+      z = *access(T, k, k+2);
+    }
+  }
+}
 
 void SVD(Matrix A, Matrix U, Matrix V) {
   Matrix B, T;
@@ -194,15 +267,18 @@ void SVD(Matrix A, Matrix U, Matrix V) {
 
   bidiag(A, B);
 
-
-  
   printMat(A);
   printMat(B);
 
 
-  cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, B.width, B.width, B.height, 1., access(B, 0, 0), B.height, access(B, 0, 0), B.height, 0., access(T, 0, 0), T.height);
+  //cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, B.width, B.width, B.height, 1., access(B, 0, 0), B.height, access(B, 0, 0), B.height, 0., access(T, 0, 0), T.height);
+  //printMat(T);
 
-  printMat(T);
+
+
+
+
+
 
   free(B.M);
   free(T.M);
