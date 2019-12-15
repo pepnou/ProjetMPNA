@@ -104,12 +104,18 @@ void house(double *x, int size, double* v, double *beta) {
   }
 }
 
-void bidiag(Matrix A, Matrix B) {
+void bidiag(Matrix A, Matrix B, Matrix U, Matrix V) {
   memcpy(B.M, A.M, B.width * B.height * sizeof(double));
 
-  Matrix Bvvt, BvvtA, sB;
+  Matrix Bvvt, BvvtA, sB, sU, sV, BvvtU, BvvtV;
   initMatrix(&Bvvt , B.height, B.height, COL_MAJOR);
   initMatrix(&BvvtA, B.height, B.height, COL_MAJOR);
+  initMatrix(&BvvtU, U.height, U.height, COL_MAJOR);
+  initMatrix(&BvvtV, V.width , V.width, COL_MAJOR);
+
+
+  identity(U);
+  identity(V);
 
 
   double *x  = NULL, 
@@ -126,8 +132,10 @@ void bidiag(Matrix A, Matrix B) {
 
     setParams(&Bvvt , size, size);
     setParams(&BvvtA, B.width - j, size);
+    setParams(&BvvtU, size, size);
 
     initSubMatrix(B, &sB, j, B.width-1, j, B.height-1);
+    initSubMatrix(U, &sU, j, U.height-1, j, U.height-1);
 
     house(x, size, v, &beta);
 
@@ -136,6 +144,15 @@ void bidiag(Matrix A, Matrix B) {
     for(int i = 0; i < size; i++) {
       *access(Bvvt, i, i) += 1.;
     }
+
+    
+
+    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, size, size, size, 1., Bvvt.M, size, access(sU, 0, 0), sU.height, 0., BvvtU.M, size);
+  
+    for(int i = 0; i < BvvtU.width; i++) {
+      memcpy(access(sU, i, 0), access(BvvtU, i, 0), size*sizeof(double));
+    }
+
 
     cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, size, sB.Xend - sB.Xstart + 1, size, 1., Bvvt.M, size, access(sB, 0, 0), sB.height, 0., BvvtA.M, size);
 
@@ -148,6 +165,7 @@ void bidiag(Matrix A, Matrix B) {
 
     clearMatrix(Bvvt);
     clearMatrix(BvvtA);
+    clearMatrix(BvvtU);
 
 
     if(j < B.width - 1) {
@@ -155,8 +173,10 @@ void bidiag(Matrix A, Matrix B) {
 
       setParams(&Bvvt , size, size);
       setParams(&BvvtA, size, B.height - j);
+      setParams(&BvvtV, size, size);
 
       initSubMatrix(B, &sB, j + 1, B.width-1, j, B.height-1);
+      initSubMatrix(V, &sV, j + 1, B.width-1, j, B.width-1);
 
       cblas_dcopy(size, access(B, j+1, j), B.height, xt, 1);
       house(xt, size, v, &beta);
@@ -166,6 +186,17 @@ void bidiag(Matrix A, Matrix B) {
       for(int i = 0; i < size; i++) {
         *access(Bvvt, i, i) += 1.;
       }
+
+
+
+      cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, size, size, size, 1., access(sV, 0, 0), sV.height, Bvvt.M, size, 0., BvvtV.M, BvvtV.height);
+
+      for(int i = 0; i < size; i++) {
+        memcpy(access(sV, i, 0), access(BvvtV, i, 0), size*sizeof(double));
+      }
+
+
+
 
       cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, sB.Yend - sB.Ystart + 1, size, size, 1., access(sB, 0, 0), sB.height, Bvvt.M, size, 0., BvvtA.M, sB.Yend - sB.Ystart + 1);
 
@@ -178,12 +209,17 @@ void bidiag(Matrix A, Matrix B) {
 
     clearMatrix(Bvvt);
     clearMatrix(BvvtA);
+    clearMatrix(BvvtV);
   }
+
+
 
   free(v);
   free(xt);
   free(Bvvt.M);
   free(BvvtA.M);
+  free(BvvtU.M);
+  free(BvvtV.M);
 }
 
 void givens(double a, double b, double *c, double *s) {
@@ -260,36 +296,113 @@ void QR(Matrix T) {
   }
 }
 
-void SVD(Matrix A, Matrix U, Matrix V) {
-  Matrix B, T;
-  initMatrix(&B, A.width, A.height, A.type);
-  initMatrix(&T, B.width, B.width, A.type);
+void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
+  int q = 0, p;
+  while(q < B.width) {
+    q = 0;
+    p = B.width - 1;
 
-  bidiag(A, B);
+    for(int k = B.width - 1; k > 0; k--) {
+      if( abs(*access(B, k + 1, k)) <= tol * (abs(*access(B, k, k)) * abs(*access(B, k+1, k+1))) ) {
+        *access(B, k+1, k) = 0;
+        if(q == B.width - k - 1) {
+          q = B.width - k;
+          p = k - 1;
+        }
+      } else {
+        if(p == k) {
+          p = k - 1;
+        }
+      }
+    }
+
+    if(q == B.width - 1) {
+      q = B.width;
+    } else {
+      int k = p + 1;
+
+      while(abs(*access(B, k, k)) > tol && k < B.width - q) {
+        k++;
+      }
+
+      if(abs(*access(B, k, k)) < tol) {
+        *access(B, k, k) = 0;
+
+        if(k < B.width - q) {
+          double bulge = *access(B, k+1, k);
+          *access(B, k+1, k) = 0;
+
+          for(int j = k + 1; j < B.width - q; j++) {
+            double c, s;
+            givens(*access(B, j, j), bulge, &c, &s);
+            *access(B, j, j) = -s * bulge + s * *access(B, j, j);
+            bulge = s * *access(B, j+1, j);
+            *access(B, j+1, j) = c * *access(B, j+1, j);
+            applyGivensRight(U, k, j, c, s);
+          }
+        } else {
+          double bulge = *access(B, B.width - q, B.width - q - 1);
+          *access(B, B.width - q, B.width - q - 1) = 0;
+
+          for(int j = B.width - q; j > p; j--) {
+            double c, s;
+            givens(*access(B, j, j), bulge, &c, &s);
+            *access(B, j, j) = c * *access(B, j, j) - s * bulge;
+            if(j > p+1) {
+              bulge = s * *access(B, j, j-1);
+              *access(B, j, j-1) = c * *access(B, j, j-1);
+            }
+            applyGivensRight(V, j, k, c, s);
+          }
+        }
+      } else {
+        //truc chiant
+      }
+    }
+  }
+
+  for(int i = 0; i < B.width; i++) {
+    if(*access(B, i, i) < 0) {
+      *access(D, i, i) = - *access(B, i, i);
+      for(int j = 0; j < V.height; j++) {
+        *access(V, i, j) = - *access(V, i, j);
+      }
+    } else {
+      *access(D, i, i) = - *access(B, i, i);
+    }
+  }
+}
+
+void SVD(Matrix A, Matrix D, Matrix U, Matrix V) {
+  Matrix B;
+  initMatrix(&B, A.width, A.height, A.type);
+
+  double tol = 0.0001 ;
+
+  bidiag(A, B, U, V);
+
+  GKSVD(B, D, U, V, tol);
+  
+
 
   printMat(A);
   printMat(B);
-
-
-  //cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, B.width, B.width, B.height, 1., access(B, 0, 0), B.height, access(B, 0, 0), B.height, 0., access(T, 0, 0), T.height);
-  //printMat(T);
-
-
-
-
-
+  printMat(U);
+  printMat(V);
 
 
   free(B.M);
-  free(T.M);
 }
 
 
 int main(int argc, char** argv) {
   int m = 5, n = 5;
 
-  Matrix A, U, V;
+  Matrix A, D, U, V;
   initMatrix(&A, n, m, COL_MAJOR);
+  initMatrix(&D, n, m, COL_MAJOR);
+  initMatrix(&U, m, m, COL_MAJOR);
+  initMatrix(&V, n, n, COL_MAJOR);
 
   srand(0);
 
@@ -300,9 +413,11 @@ int main(int argc, char** argv) {
     }
   }
 
-  SVD(A, U, V);
+  SVD(A, D, U, V);
 
   free(A.M);
+  free(U.M);
+  free(V.M);
 
   exit(0);
 }
