@@ -296,6 +296,39 @@ void QR(Matrix T) {
   }
 }
 
+
+double wilkinsonshift(double a1, double b, double a2) {
+  double d = (a1 - a2) / 2;
+
+  if(d == 0) {
+    if(a2 > 0) {
+      return a2 + abs(b);
+    } else {
+      return a2 - abs(b);
+    }
+  } else {
+    return a2 - b*b / (d * sign(d) * sqrt(d*d + b*b));
+  }
+}
+
+void GKSVDstep(Matrix B, Matrix U, Matrix V) {
+  double mu;
+
+  int N = B.Xend - B.Xstart,
+      M = B.Yend - B.Ystart;
+
+  if(N > 2) {
+    mu = wilkinsonshift(
+        *access(B, N-1, N-1) * *access(B, N-1, N-1), 
+        *access(B, N-1, N-1) * *access(B, N, N-1),
+        *access(B, N, N) * *access(B, N, N) + *access(B, N, N-1) * *access(B, N, N-1));
+  } else if(N == 2) {
+    //TODO
+  } else {
+    exit(1);
+  }
+}
+
 void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
   int q = 0, p;
   while(q < B.width) {
