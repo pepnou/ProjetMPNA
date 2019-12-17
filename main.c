@@ -314,8 +314,8 @@ double wilkinsonshift(double a1, double b, double a2) {
 void GKSVDstep(Matrix B, Matrix U, Matrix V) {
   double mu;
 
-  int N = B.Xend - B.Xstart,
-      M = B.Yend - B.Ystart;
+  int N = B.Xend - B.Xstart;
+  //int M = B.Yend - B.Ystart;
 
   if(N > 2) {
     mu = wilkinsonshift(
@@ -323,14 +323,56 @@ void GKSVDstep(Matrix B, Matrix U, Matrix V) {
         *access(B, N-1, N-1) * *access(B, N, N-1),
         *access(B, N, N) * *access(B, N, N) + *access(B, N, N-1) * *access(B, N, N-1));
   } else if(N == 2) {
-    //TODO
+    mu = wilkinsonshift(
+        *access(B, N-1, N-1) * *access(B, N-1, N-1),
+        *access(B, N-1, N-1) * *access(B, N, N-1),
+        *access(B, N, N) * *access(B, N, N) + *access(B, N, N-1) * *access(B, N, N-1));
   } else {
     exit(1);
   }
+
+  double x = *access(B, 0, 0) * *access(B, 0, 0) - mu;
+  double y = *access(B, 0, 0) * *access(B, 1, 0);
+  double bulge = 0., c, s;
+
+  for(int k = 0; k < N-1; k++) {
+    givens(x, y, &c, &s);
+    applyGivensRight(V, k, k+1, c, s);
+
+    if(k > 0) {
+      *access(B, k, k-1) = c * *access(B, k, k-1) - s * bulge;
+    }
+
+    double Bk = *access(B, k , k);
+    bulge = -s * *access(B, k+1, k+1);
+    *access(B, k, k) = c * Bk - s * *access(B, k+1, k);
+    *access(B, k+1, k) = s * Bk + c * *access(B, k+1, k);
+    *access(B, k+1, k+1) = c * *access(B, k+1, k+1);
+
+    x = *access(B, k, k);
+    y = bulge;
+    givens(x, y, &c, &s);
+    applyGivensRight(U, k, k+1, c, s);
+
+    *access(B, k, k) = c * *access(B, k, k) - s * bulge;
+    double Bk2 = *access(B, k+1, k);
+    *access(B, k+1, k) = c * Bk2 - s * *access(B, k+1, k+1);
+    bulge = -s * *access(B, k+2, k+1);
+    *access(B, k+1, k+1) = s * Bk2 + c * *access(B, k+1, k+1);
+    *access(B, k+2, k+1) = c * *access(B, k+2, k+1);
+
+    x = *access(B, k+1, k);
+    y = bulge;
+  }
+
+  *access(B, N+1, N) = 0;
 }
 
 void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
   int q = 0, p;
+
+  Matrix sB, sU, sV;
+
   while(q < B.width) {
     q = 0;
     p = B.width - 1;
@@ -389,7 +431,11 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
           }
         }
       } else {
-        //truc chiant
+        initSubMatrix(B, &sB, 0, B.width-1, p+1, B.width - 1 - q);
+        initSubMatrix(U, &sU, p+1, U.width - 1 - q, 0, U.height - 1);
+        initSubMatrix(V, &sV, p+1, V.width - 1 - q, 0, V.height - 1);
+
+        GKSVDstep(sB, sU, sV);
       }
     }
   }
