@@ -373,32 +373,48 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
 
   Matrix sB, sU, sV;
 
-  while(q < B.width) {
-    q = 0;
-    p = B.width - 1;
+  //int M = U.height;
+  int N = V.height;
 
-    for(int k = B.width - 1; k > 0; k--) {
+  while(q < N) {
+    q = 0;
+    //p = N - 1;
+    p = N - 1;
+
+    for(int k = N - 2; k >= 0; k--) {
       if( abs(*access(B, k + 1, k)) <= tol * (abs(*access(B, k, k)) * abs(*access(B, k+1, k+1))) ) {
         *access(B, k+1, k) = 0;
-        if(q == B.width - k - 1) {
-          q = B.width - k;
-          p = k - 1;
+        if(q == N - k - 2) {
+          //q = N - k - 1;
+          q++;
+          //p = k - 1;
+          p--;
         }
       } else {
-        if(p == k) {
-          p = k - 1;
+        if(p == k + 1) {
+          //p = k - 1;
+          p--;
         }
       }
+
+      printf("k: %d, p: %d, q: %d\n", k, p, q);
     }
 
-    if(q == B.width - 1) {
+    printf("%d %d\n", q, p);
+
+    printMat(B);
+    for(unsigned long l = 0; l < 1000000000; l++);
+
+    if(q == B.width) {
       q = B.width;
     } else {
-      int k = p + 1;
+      int k = p;
 
-      while(abs(*access(B, k, k)) > tol && k < B.width - q) {
+      while(k < B.width - q - 1 && abs(*access(B, k, k)) > tol) {
         k++;
       }
+
+      printf("%d\n", k);
 
       if(abs(*access(B, k, k)) < tol) {
         *access(B, k, k) = 0;
@@ -407,7 +423,7 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
           double bulge = *access(B, k+1, k);
           *access(B, k+1, k) = 0;
 
-          for(int j = k + 1; j < B.width - q; j++) {
+          for(int j = k + 1; j < B.width - q - 1; j++) {
             double c, s;
             givens(*access(B, j, j), bulge, &c, &s);
             *access(B, j, j) = -s * bulge + s * *access(B, j, j);
@@ -431,9 +447,9 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
           }
         }
       } else {
-        initSubMatrix(B, &sB, 0, B.width-1, p+1, B.width - 1 - q);
-        initSubMatrix(U, &sU, p+1, U.width - 1 - q, 0, U.height - 1);
-        initSubMatrix(V, &sV, p+1, V.width - 1 - q, 0, V.height - 1);
+        initSubMatrix(B, &sB, 0, B.width-1, p, B.width - 1 - q);
+        initSubMatrix(U, &sU, p, U.width - 1 - q, 0, U.height - 1);
+        initSubMatrix(V, &sV, p, V.width - 1 - q, 0, V.height - 1);
 
         GKSVDstep(sB, sU, sV);
       }
