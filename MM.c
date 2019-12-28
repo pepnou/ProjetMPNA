@@ -42,8 +42,8 @@ void matMul(double *A, double *B, double *C, int m, int n, int k) {
 
   // create line and column communicator
   MPI_Comm lineComm, columnComm;
-  MPI_Comm_split(MPI_COMM_WORLD, pos[0], rank, &lineComm);
-  MPI_Comm_split(MPI_COMM_WORLD, pos[1], rank, &columnComm);
+  MPI_Comm_split(MPI_COMM_WORLD, pos[0], rank, &columnComm);
+  MPI_Comm_split(MPI_COMM_WORLD, pos[1], rank, &lineComm);
   
   
   //create datatype for scatter
@@ -53,59 +53,67 @@ void matMul(double *A, double *B, double *C, int m, int n, int k) {
   MPI_Type_create_resized(type1, 0, sizeof(double), &type2);
   MPI_Type_commit(&type2);
 
-  //int MPI_Scatter(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm)
 
-  
-  double *tmp = malloc(n*m*sizeof(double));
-  memset(tmp, 0, n*m*sizeof(double));
+  double *Aline   = malloc(n*sizeof(double)),
+         *Bcolumn = malloc(n*sizeof(double)),
+         *Ccolumn = malloc(m*sizeof(double));
 
   // Scatter
   if(pos[0] == 0) {
-    MPI_Scatter(A, 2, type2, tmp, n*2, MPI_DOUBLE, 0, columnComm);
+    MPI_Scatter(A, 1, type2, Aline, n, MPI_DOUBLE, 0, columnComm);
   }
 
-  for(int i = 0; i < size; i++) {
-    if(i == rank && pos[0] == 0) {
-      printf("\nRank %d\n", rank);
-      for(int j = 0; j < n*m; j++) {
-        printf("%3.0lf ", tmp[j]);
+  if(pos[1] == 0) {
+    MPI_Scatter(B, n, MPI_DOUBLE, Bcolumn, n, MPI_DOUBLE, 0, lineComm);
+  }
+
+  MPI_Bcast(Aline, n, MPI_DOUBLE, 0, lineComm);
+
+  MPI_Bcast(Bcolumn, n, MPI_DOUBLE, 0, columnComm);
+
+
+
+  double res = 0.;
+#pragma omp parallel for reduction(+:res)
+  for(int i = 0; i < n; i++)
+    res = res + (Aline[i] * Bcolumn[i]);
+
+  /*for(int i = 0; i < size; i++) {
+    if(i == rank) {
+      printf("\nrank : %d\n", rank);
+      for(int j = 0; j < n; j++) {
+        printf("%3.0lf ", Aline[j]);
+      }
+      printf("\n");
+      for(int j = 0; j < n; j++) {
+        printf("%3.0lf ", Bcolumn[j]);
+      }
+      printf("\n%3.0lf\n", res);
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+  }*/
+
+  
+  MPI_Gather(&res, 1, MPI_DOUBLE, Ccolumn, 1, MPI_DOUBLE, 0, columnComm);
+
+  if(pos[1] == 0) {
+    MPI_Gather(Ccolumn, m, MPI_DOUBLE, C, m, MPI_DOUBLE, 0, lineComm);
+  }
+
+  if(rank == 0) {
+    for(int i = 0; i < m; i++) {
+      for(int j = 0; j < n; j++) {
+        printf("%3.0lf ", C[i + m*j]);
       }
       printf("\n");
     }
-    MPI_Barrier(MPI_COMM_WORLD);
-  }
-
-  /*if(rank == 0) {
-    MPI_Send(A, m, type2, 1, 0, MPI_COMM_WORLD);
-  }
-
-  if(rank == 1) {
-    MPI_Recv(tmp, m*n, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    
-    for(int i = 0; i < m*n; i++) {
-      printf("%3.0lf ", tmp[i]);
-    }
-    printf("\n");
-  }
-  
-  MPI_Barrier(MPI_COMM_WORLD);
-
-  if(rank == 0) {
-    for(int i = 0; i < m*n; i++) {
-      printf("%3.0lf ", A[i]);
-    }
-    printf("\n");
-  }*/
-
-  if(pos[1] == 0) {
-
   }
 }
 
 int main(int argc, char** argv) {
   MPI_Init(&argc, &argv);
 
-  int m = 6, n = 2, k = 2;
+  int m = 3, n = 2, k = 2;
   
   double *A = malloc(m*n*sizeof(double)), 
          *B = malloc(n*k*sizeof(double)), 
