@@ -1,0 +1,26 @@
+#!/bin/bash
+
+for i in {1..40}
+do
+  for j in {14..14}
+  do
+    k=$((2**${j}))
+    printf "\
+#!/bin/bash\n\
+#@ class            = clallmds+\n\
+#@ job_name         = svd_calcul\n\
+#@ total_tasks      = ${i}\n\
+#@ node             = ${i}\n\
+#@ wall_clock_limit = 00:30:00\n\
+#@ output           = ./log2/svd.${i}.${j}.log\n\
+#@ error            = ./err2/svd.${i}.${j}.err\n\
+#@ job_type         = mpich\n\
+#@ environment      = COPY_ALL\n\
+#@ queue\n\
+#\n\
+module load gnu/7.3.0 openmpi/2.1.3_gnu73\n\
+export OMP_NUM_THREADS=16\n\
+mpirun -np ${i} --map-by ppr:1:node ./MM.out ${k}" > ./submit2/batch${i}_${j}.sh
+    llsubmit ./submit2/batch${i}_${j}.sh
+  done
+done
