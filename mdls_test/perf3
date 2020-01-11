@@ -2,9 +2,6 @@ svd.10.10.log:1.230384
 svd.10.11.log:4.935962
 svd.10.12.log:49.764222
 svd.10.13.log:828.189479
-svd.10.14.log:--------------------------------------------------------------------------
-svd.10.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare023-adm exited on signal 9 (Killed).
-svd.10.14.log:--------------------------------------------------------------------------
 svd.10.6.log:0.093221
 svd.10.7.log:0.079752
 svd.10.8.log:0.122352
@@ -14,14 +11,8 @@ svd.11.10.log:1.138692
 svd.11.11.log:5.235836
 svd.11.12.log:48.906861
 svd.11.13.log:463.758693
-svd.11.14.log:--------------------------------------------------------------------------
-svd.11.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare023-adm exited on signal 9 (Killed).
-svd.11.14.log:--------------------------------------------------------------------------
 svd.1.11.log:50.816920
 svd.1.12.log:384.561011
-svd.1.14.log:--------------------------------------------------------------------------
-svd.1.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare058-adm exited on signal 9 (Killed).
-svd.1.14.log:--------------------------------------------------------------------------
 svd.11.6.log:0.077159
 svd.11.7.log:0.102275
 svd.11.8.log:0.107985
@@ -30,9 +21,6 @@ svd.12.10.log:1.148732
 svd.12.11.log:4.993214
 svd.12.12.log:57.044714
 svd.12.13.log:782.014236
-svd.12.14.log:--------------------------------------------------------------------------
-svd.12.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare023-adm exited on signal 9 (Killed).
-svd.12.14.log:--------------------------------------------------------------------------
 svd.12.6.log:0.120047
 svd.12.8.log:0.145173
 svd.12.9.log:0.159923
@@ -48,9 +36,6 @@ svd.14.10.log:1.023271
 svd.14.11.log:4.594202
 svd.14.12.log:37.170817
 svd.14.13.log:439.600409
-svd.14.14.log:--------------------------------------------------------------------------
-svd.14.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare023-adm exited on signal 9 (Killed).
-svd.14.14.log:--------------------------------------------------------------------------
 svd.14.6.log:0.116947
 svd.14.7.log:0.097884
 svd.14.8.log:0.146961
@@ -59,9 +44,6 @@ svd.15.10.log:1.110044
 svd.15.11.log:5.275175
 svd.15.12.log:49.927633
 svd.15.13.log:609.075771
-svd.15.14.log:--------------------------------------------------------------------------
-svd.15.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare023-adm exited on signal 9 (Killed).
-svd.15.14.log:--------------------------------------------------------------------------
 svd.15.6.log:0.104050
 svd.15.7.log:0.125123
 svd.15.8.log:0.135109
@@ -70,9 +52,6 @@ svd.16.10.log:1.854768
 svd.16.11.log:4.927735
 svd.16.12.log:25.439643
 svd.16.13.log:719.837564
-svd.16.14.log:--------------------------------------------------------------------------
-svd.16.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare023-adm exited on signal 9 (Killed).
-svd.16.14.log:--------------------------------------------------------------------------
 svd.16.6.log:0.203964
 svd.16.7.log:0.186826
 svd.16.8.log:0.244995
@@ -82,9 +61,6 @@ svd.17.10.log:1.456651
 svd.17.11.log:4.698905
 svd.17.12.log:48.519164
 svd.17.13.log:715.360477
-svd.17.14.log:--------------------------------------------------------------------------
-svd.17.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare023-adm exited on signal 9 (Killed).
-svd.17.14.log:--------------------------------------------------------------------------
 svd.17.6.log:0.138823
 svd.17.7.log:0.151774
 svd.17.8.log:0.192166
@@ -103,9 +79,6 @@ svd.19.10.log:1.972219
 svd.19.11.log:4.916086
 svd.19.12.log:20.304706
 svd.19.13.log:393.432617
-svd.19.14.log:--------------------------------------------------------------------------
-svd.19.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare023-adm exited on signal 9 (Killed).
-svd.19.14.log:--------------------------------------------------------------------------
 svd.19.6.log:0.144249
 svd.19.7.log:0.118599
 svd.19.8.log:0.199611
@@ -126,9 +99,6 @@ svd.21.12.log:29.960884
 svd.21.13.log:427.906834
 svd.2.11.log:26.494653
 svd.2.12.log:242.758422
-svd.2.14.log:--------------------------------------------------------------------------
-svd.2.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare058-adm exited on signal 9 (Killed).
-svd.2.14.log:--------------------------------------------------------------------------
 svd.21.6.log:0.188809
 svd.21.7.log:0.173590
 svd.21.8.log:0.180895
@@ -137,25 +107,6 @@ svd.22.10.log:8.042170
 svd.22.11.log:4.683428
 svd.22.12.log:44.625094
 svd.22.13.log:443.426662
-svd.22.14.log:--------------------------------------------------------------------------
-svd.22.14.log:The OpenFabrics (openib) BTL failed to initialize while trying to
-svd.22.14.log:allocate some locked memory.  This typically can indicate that the
-svd.22.14.log:memlock limits are set too low.  For most HPC installations, the
-svd.22.14.log:memlock limits should be set to "unlimited".  The failure occured
-svd.22.14.log:here:
-svd.22.14.log:
-svd.22.14.log:  Local host:    poincare059-adm
-svd.22.14.log:  OMPI source:   ../../../../../src/openmpi-2.1.3/opal/mca/btl/openib/btl_openib.c:794
-svd.22.14.log:  Function:      opal_free_list_init()
-svd.22.14.log:  Device:        qib0
-svd.22.14.log:  Memlock limit: unlimited
-svd.22.14.log:
-svd.22.14.log:You may need to consult with your system administrator to get this
-svd.22.14.log:problem fixed.  This FAQ entry on the Open MPI web site may also be
-svd.22.14.log:helpful:
-svd.22.14.log:
-svd.22.14.log:    http://www.open-mpi.org/faq/?category=openfabrics#ib-locked-pages
-svd.22.14.log:--------------------------------------------------------------------------
 svd.22.6.log:0.219424
 svd.22.7.log:0.182490
 svd.22.8.log:0.236059
@@ -172,25 +123,6 @@ svd.24.10.log:6.906658
 svd.24.11.log:4.563942
 svd.24.12.log:38.719312
 svd.24.13.log:318.143569
-svd.24.14.log:--------------------------------------------------------------------------
-svd.24.14.log:The OpenFabrics (openib) BTL failed to initialize while trying to
-svd.24.14.log:allocate some locked memory.  This typically can indicate that the
-svd.24.14.log:memlock limits are set too low.  For most HPC installations, the
-svd.24.14.log:memlock limits should be set to "unlimited".  The failure occured
-svd.24.14.log:here:
-svd.24.14.log:
-svd.24.14.log:  Local host:    poincare069-adm
-svd.24.14.log:  OMPI source:   ../../../../../src/openmpi-2.1.3/opal/mca/btl/openib/btl_openib.c:794
-svd.24.14.log:  Function:      opal_free_list_init()
-svd.24.14.log:  Device:        qib0
-svd.24.14.log:  Memlock limit: unlimited
-svd.24.14.log:
-svd.24.14.log:You may need to consult with your system administrator to get this
-svd.24.14.log:problem fixed.  This FAQ entry on the Open MPI web site may also be
-svd.24.14.log:helpful:
-svd.24.14.log:
-svd.24.14.log:    http://www.open-mpi.org/faq/?category=openfabrics#ib-locked-pages
-svd.24.14.log:--------------------------------------------------------------------------
 svd.24.6.log:0.194578
 svd.24.7.log:0.179187
 svd.24.8.log:0.291283
@@ -199,25 +131,6 @@ svd.25.10.log:6.566659
 svd.25.11.log:4.608391
 svd.25.12.log:23.912174
 svd.25.13.log:468.757645
-svd.25.14.log:--------------------------------------------------------------------------
-svd.25.14.log:The OpenFabrics (openib) BTL failed to initialize while trying to
-svd.25.14.log:allocate some locked memory.  This typically can indicate that the
-svd.25.14.log:memlock limits are set too low.  For most HPC installations, the
-svd.25.14.log:memlock limits should be set to "unlimited".  The failure occured
-svd.25.14.log:here:
-svd.25.14.log:
-svd.25.14.log:  Local host:    poincare027-adm
-svd.25.14.log:  OMPI source:   ../../../../../src/openmpi-2.1.3/opal/mca/btl/openib/btl_openib.c:794
-svd.25.14.log:  Function:      opal_free_list_init()
-svd.25.14.log:  Device:        qib0
-svd.25.14.log:  Memlock limit: unlimited
-svd.25.14.log:
-svd.25.14.log:You may need to consult with your system administrator to get this
-svd.25.14.log:problem fixed.  This FAQ entry on the Open MPI web site may also be
-svd.25.14.log:helpful:
-svd.25.14.log:
-svd.25.14.log:    http://www.open-mpi.org/faq/?category=openfabrics#ib-locked-pages
-svd.25.14.log:--------------------------------------------------------------------------
 svd.25.6.log:0.193387
 svd.25.7.log:0.196267
 svd.25.8.log:0.326779
@@ -225,9 +138,6 @@ svd.25.9.log:0.311549
 svd.26.11.log:5.090880
 svd.26.12.log:19.370049
 svd.26.13.log:441.981079
-svd.26.14.log:--------------------------------------------------------------------------
-svd.26.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare052-adm exited on signal 9 (Killed).
-svd.26.14.log:--------------------------------------------------------------------------
 svd.26.6.log:0.285842
 svd.26.7.log:0.722163
 svd.26.8.log:0.222731
@@ -237,25 +147,6 @@ svd.27.10.log:6.812184
 svd.27.11.log:4.648056
 svd.27.12.log:39.020222
 svd.27.13.log:280.310456
-svd.27.14.log:--------------------------------------------------------------------------
-svd.27.14.log:The OpenFabrics (openib) BTL failed to initialize while trying to
-svd.27.14.log:allocate some locked memory.  This typically can indicate that the
-svd.27.14.log:memlock limits are set too low.  For most HPC installations, the
-svd.27.14.log:memlock limits should be set to "unlimited".  The failure occured
-svd.27.14.log:here:
-svd.27.14.log:
-svd.27.14.log:  Local host:    poincare065-adm
-svd.27.14.log:  OMPI source:   ../../../../../src/openmpi-2.1.3/opal/mca/btl/openib/btl_openib.c:752
-svd.27.14.log:  Function:      opal_free_list_init()
-svd.27.14.log:  Device:        qib0
-svd.27.14.log:  Memlock limit: unlimited
-svd.27.14.log:
-svd.27.14.log:You may need to consult with your system administrator to get this
-svd.27.14.log:problem fixed.  This FAQ entry on the Open MPI web site may also be
-svd.27.14.log:helpful:
-svd.27.14.log:
-svd.27.14.log:    http://www.open-mpi.org/faq/?category=openfabrics#ib-locked-pages
-svd.27.14.log:--------------------------------------------------------------------------
 svd.27.6.log:0.214834
 svd.27.7.log:0.270016
 svd.27.8.log:0.216721
@@ -265,9 +156,6 @@ svd.28.10.log:7.582495
 svd.28.11.log:4.932930
 svd.28.12.log:36.678599
 svd.28.13.log:317.335121
-svd.28.14.log:--------------------------------------------------------------------------
-svd.28.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare052-adm exited on signal 9 (Killed).
-svd.28.14.log:--------------------------------------------------------------------------
 svd.28.6.log:0.311619
 svd.28.7.log:0.296730
 svd.28.8.log:0.217699
@@ -277,25 +165,6 @@ svd.29.10.log:6.251908
 svd.29.11.log:3.738979
 svd.29.12.log:38.291727
 svd.29.13.log:316.647022
-svd.29.14.log:--------------------------------------------------------------------------
-svd.29.14.log:The OpenFabrics (openib) BTL failed to initialize while trying to
-svd.29.14.log:allocate some locked memory.  This typically can indicate that the
-svd.29.14.log:memlock limits are set too low.  For most HPC installations, the
-svd.29.14.log:memlock limits should be set to "unlimited".  The failure occured
-svd.29.14.log:here:
-svd.29.14.log:
-svd.29.14.log:  Local host:    poincare027-adm
-svd.29.14.log:  OMPI source:   ../../../../../src/openmpi-2.1.3/opal/mca/btl/openib/btl_openib.c:752
-svd.29.14.log:  Function:      opal_free_list_init()
-svd.29.14.log:  Device:        qib0
-svd.29.14.log:  Memlock limit: unlimited
-svd.29.14.log:
-svd.29.14.log:You may need to consult with your system administrator to get this
-svd.29.14.log:problem fixed.  This FAQ entry on the Open MPI web site may also be
-svd.29.14.log:helpful:
-svd.29.14.log:
-svd.29.14.log:    http://www.open-mpi.org/faq/?category=openfabrics#ib-locked-pages
-svd.29.14.log:--------------------------------------------------------------------------
 svd.29.6.log:0.197008
 svd.29.7.log:0.218669
 svd.29.8.log:0.243637
@@ -317,9 +186,6 @@ svd.31.13.log:264.588033
 svd.3.11.log:6.182730
 svd.3.12.log:85.816552
 svd.3.13.log:927.235603
-svd.3.14.log:--------------------------------------------------------------------------
-svd.3.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare058-adm exited on signal 9 (Killed).
-svd.3.14.log:--------------------------------------------------------------------------
 svd.31.6.log:0.316601
 svd.31.7.log:0.252096
 svd.31.8.log:0.258197
@@ -328,43 +194,6 @@ svd.32.10.log:7.002120
 svd.32.11.log:3.247361
 svd.32.12.log:25.667698
 svd.32.13.log:300.149690
-svd.32.14.log:--------------------------------------------------------------------------
-svd.32.14.log:Failed to register memory region (MR):
-svd.32.14.log:
-svd.32.14.log:Hostname: poincare065-adm
-svd.32.14.log:Address:  e39000
-svd.32.14.log:Length:   20480
-svd.32.14.log:Error:    Cannot allocate memory
-svd.32.14.log:--------------------------------------------------------------------------
-svd.32.14.log:--------------------------------------------------------------------------
-svd.32.14.log:Open MPI has detected that there are UD-capable Verbs devices on your
-svd.32.14.log:system, but none of them were able to be setup properly.  This may
-svd.32.14.log:indicate a problem on this system.
-svd.32.14.log:
-svd.32.14.log:You job will continue, but Open MPI will ignore the "ud" oob component
-svd.32.14.log:in this run.
-svd.32.14.log:
-svd.32.14.log:Hostname: poincare065-adm
-svd.32.14.log:--------------------------------------------------------------------------
-svd.32.14.log:--------------------------------------------------------------------------
-svd.32.14.log:The OpenFabrics (openib) BTL failed to initialize while trying to
-svd.32.14.log:allocate some locked memory.  This typically can indicate that the
-svd.32.14.log:memlock limits are set too low.  For most HPC installations, the
-svd.32.14.log:memlock limits should be set to "unlimited".  The failure occured
-svd.32.14.log:here:
-svd.32.14.log:
-svd.32.14.log:  Local host:    poincare086-adm
-svd.32.14.log:  OMPI source:   ../../../../../src/openmpi-2.1.3/opal/mca/btl/openib/btl_openib.c:752
-svd.32.14.log:  Function:      opal_free_list_init()
-svd.32.14.log:  Device:        qib0
-svd.32.14.log:  Memlock limit: unlimited
-svd.32.14.log:
-svd.32.14.log:You may need to consult with your system administrator to get this
-svd.32.14.log:problem fixed.  This FAQ entry on the Open MPI web site may also be
-svd.32.14.log:helpful:
-svd.32.14.log:
-svd.32.14.log:    http://www.open-mpi.org/faq/?category=openfabrics#ib-locked-pages
-svd.32.14.log:--------------------------------------------------------------------------
 svd.32.6.log:0.405616
 svd.32.7.log:0.260452
 svd.32.8.log:0.394089
@@ -429,79 +258,6 @@ svd.39.10.log:0.584550
 svd.39.11.log:3.439274
 svd.39.12.log:17.456960
 svd.39.13.log:265.485413
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:Failed to register memory region (MR):
-svd.39.14.log:
-svd.39.14.log:Hostname: poincare082-adm
-svd.39.14.log:Address:  8cf000
-svd.39.14.log:Length:   20480
-svd.39.14.log:Error:    Cannot allocate memory
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:Open MPI has detected that there are UD-capable Verbs devices on your
-svd.39.14.log:system, but none of them were able to be setup properly.  This may
-svd.39.14.log:indicate a problem on this system.
-svd.39.14.log:
-svd.39.14.log:You job will continue, but Open MPI will ignore the "ud" oob component
-svd.39.14.log:in this run.
-svd.39.14.log:
-svd.39.14.log:Hostname: poincare082-adm
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:Failed to register memory region (MR):
-svd.39.14.log:
-svd.39.14.log:Hostname: poincare081-adm
-svd.39.14.log:Address:  18ef000
-svd.39.14.log:Length:   20480
-svd.39.14.log:Error:    Cannot allocate memory
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:Open MPI has detected that there are UD-capable Verbs devices on your
-svd.39.14.log:system, but none of them were able to be setup properly.  This may
-svd.39.14.log:indicate a problem on this system.
-svd.39.14.log:
-svd.39.14.log:You job will continue, but Open MPI will ignore the "ud" oob component
-svd.39.14.log:in this run.
-svd.39.14.log:
-svd.39.14.log:Hostname: poincare081-adm
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:Failed to register memory region (MR):
-svd.39.14.log:
-svd.39.14.log:Hostname: poincare085-adm
-svd.39.14.log:Address:  ba6b3000
-svd.39.14.log:Length:   2097152
-svd.39.14.log:Error:    Cannot allocate memory
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:Open MPI has detected that there are UD-capable Verbs devices on your
-svd.39.14.log:system, but none of them were able to be setup properly.  This may
-svd.39.14.log:indicate a problem on this system.
-svd.39.14.log:
-svd.39.14.log:You job will continue, but Open MPI will ignore the "ud" oob component
-svd.39.14.log:in this run.
-svd.39.14.log:
-svd.39.14.log:Hostname: poincare085-adm
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:--------------------------------------------------------------------------
-svd.39.14.log:The OpenFabrics (openib) BTL failed to initialize while trying to
-svd.39.14.log:allocate some locked memory.  This typically can indicate that the
-svd.39.14.log:memlock limits are set too low.  For most HPC installations, the
-svd.39.14.log:memlock limits should be set to "unlimited".  The failure occured
-svd.39.14.log:here:
-svd.39.14.log:
-svd.39.14.log:  Local host:    poincare086-adm
-svd.39.14.log:  OMPI source:   ../../../../../src/openmpi-2.1.3/opal/mca/btl/openib/btl_openib.c:752
-svd.39.14.log:  Function:      opal_free_list_init()
-svd.39.14.log:  Device:        qib0
-svd.39.14.log:  Memlock limit: unlimited
-svd.39.14.log:
-svd.39.14.log:You may need to consult with your system administrator to get this
-svd.39.14.log:problem fixed.  This FAQ entry on the Open MPI web site may also be
-svd.39.14.log:helpful:
-svd.39.14.log:
-svd.39.14.log:    http://www.open-mpi.org/faq/?category=openfabrics#ib-locked-pages
-svd.39.14.log:--------------------------------------------------------------------------
 svd.39.6.log:0.319122
 svd.39.7.log:0.326965
 svd.39.8.log:0.462356
@@ -511,25 +267,6 @@ svd.40.10.log:0.411136
 svd.40.11.log:3.805601
 svd.40.12.log:17.009377
 svd.40.13.log:251.556504
-svd.40.14.log:--------------------------------------------------------------------------
-svd.40.14.log:The OpenFabrics (openib) BTL failed to initialize while trying to
-svd.40.14.log:allocate some locked memory.  This typically can indicate that the
-svd.40.14.log:memlock limits are set too low.  For most HPC installations, the
-svd.40.14.log:memlock limits should be set to "unlimited".  The failure occured
-svd.40.14.log:here:
-svd.40.14.log:
-svd.40.14.log:  Local host:    poincare086-adm
-svd.40.14.log:  OMPI source:   ../../../../../src/openmpi-2.1.3/opal/mca/btl/openib/btl_openib.c:752
-svd.40.14.log:  Function:      opal_free_list_init()
-svd.40.14.log:  Device:        qib0
-svd.40.14.log:  Memlock limit: unlimited
-svd.40.14.log:
-svd.40.14.log:You may need to consult with your system administrator to get this
-svd.40.14.log:problem fixed.  This FAQ entry on the Open MPI web site may also be
-svd.40.14.log:helpful:
-svd.40.14.log:
-svd.40.14.log:    http://www.open-mpi.org/faq/?category=openfabrics#ib-locked-pages
-svd.40.14.log:--------------------------------------------------------------------------
 svd.40.6.log:0.430655
 svd.40.7.log:0.296448
 svd.40.8.log:0.328976
@@ -538,9 +275,6 @@ svd.4.10.log:1.288637
 svd.4.11.log:4.707411
 svd.4.12.log:33.280356
 svd.4.13.log:892.005638
-svd.4.14.log:--------------------------------------------------------------------------
-svd.4.14.log:mpirun noticed that process rank 0 with PID 0 on node poincare058-adm exited on signal 9 (Killed).
-svd.4.14.log:--------------------------------------------------------------------------
 svd.4.6.log:0.036369
 svd.4.7.log:0.054612
 svd.4.8.log:0.091328
