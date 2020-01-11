@@ -371,7 +371,7 @@ void GKSVDstep(Matrix B, Matrix U, Matrix V) {
   int size = B.Xend - B.Xstart + 1;
   int N = size - 1;
 
-  if(size > 2) {
+  /*if(size > 2) {
     mu = wilkinsonshift(
         *access(B, N-1, N-1) * *access(B, N-1, N-1), 
         *access(B, N-1, N-1) * *access(B, N, N-1),
@@ -384,7 +384,28 @@ void GKSVDstep(Matrix B, Matrix U, Matrix V) {
   } else {
     printf("N < 2\n");
     exit(1);
-  }
+  }*/
+
+  double  dm = *access(B, N - 1, N - 1),
+          dn = *access(B, N, N),
+          fm = *access(B, N, N - 1),
+          fm1 = *access(B, N - 1, N - 2);
+
+  double tnn   = dn*dn+fm*fm,
+         tn1n1 = dm*dm+fm1*fm1,
+         tnn1  = dm*fm;
+
+  double d = (tn1n1 - tnn) / 2;
+  mu = tnn - pow(tnn1, 2) / (d + sign(d) * sqrt(pow(d, 2) + pow(tnn1, 2)));
+
+
+  printf("[%lf %lf\n %lf %lf]\n",
+      dm*dm+fm1*fm1,
+      dm*fm,
+      dm*fm,
+      dn*dn+fm*fm);
+
+  printf("mu : %lf\n", mu);
 
   double x = *access(B, 0, 0) * *access(B, 0, 0) - mu;
   double y = *access(B, 0, 0) * *access(B, 1, 0);
