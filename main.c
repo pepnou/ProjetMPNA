@@ -50,22 +50,6 @@ double* access(Matrix M, int x, int y) {
   }
 }
 
-void reallocMatrix(Matrix *M) {
-  /*M->M = (double*) realloc(M->M, (M->width + 1) * M->height * sizeof(double));
-  if(M->M == NULL) {
-    fprintf(stderr,"realloc fail\n");
-    exit(1);
-  }*/
-
-  double* tmp = (double*) calloc((M->width+1) * M->height, sizeof(double));
-  memcpy(tmp, M->M, M->height * M->width * sizeof(double));
-  //free(M->M);
-  M->M = tmp;
-
-  //memset((void*)access(*M, M->width, 0), 0, M->height * sizeof(double));
-
-  M->width = M->width + 1;
-}
 
 void setParams(Matrix *M, int width, int height) {
   M->width = width;
@@ -175,9 +159,6 @@ void bidiag(Matrix A, Matrix B, Matrix U, Matrix V) {
     for(int i = 0; i < sBvvt.Xstart; i++) {
       *access(Bvvt, i, i) = 1;
     }
-    //printf("Bvvt (gauche):\n");
-    //printMat(Bvvt);
-
 
     cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, U.height, Bvvt.width, U.width, 1., access(U, 0, 0), U.height, access(Bvvt, 0, 0), Bvvt.height, 0., access(tmpU, 0, 0), tmpU.height);
     memcpy(U.M, tmpU.M, U.width*U.height*sizeof(double));
@@ -221,9 +202,6 @@ void bidiag(Matrix A, Matrix B, Matrix U, Matrix V) {
       for(int i = 0; i < sBvvt.Xstart; i++) {
         *access(Bvvt, i, i) = 1;
       }
-      //printf("Bvvt (droite):\n");
-      //printMat(Bvvt);
-
 
       cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, V.height, Bvvt.width, V.width, 1., access(V, 0, 0), V.height, access(Bvvt, 0, 0), Bvvt.height, 0., access(tmpV, 0, 0), tmpV.height);
       memcpy(V.M, tmpV.M, V.width*V.height*sizeof(double));
@@ -321,70 +299,11 @@ void applyGivensRight(Matrix T, int i, int k, double c, double s) {
   }
 }
 
-
-void QR(Matrix T) {
-  double TNN     = *access(T, T.width - 1, T.height - 1),
-         TNNM1   = *access(T, T.width - 2, T.height - 1),
-         //TNM1N   = *access(T, T.width - 1, T.height - 2),
-         TNM1NM1 = *access(T, T.width - 2, T.height - 2);
-
-
-  double d = ( TNM1NM1 - TNN ) / 2;
-  double mu = TNN - TNNM1 * TNNM1 / ( d + sign(d) * sqrt(d*d + TNNM1 * TNNM1) );
-
-  double x = *access(T, 0, 0) - mu;
-  double z = *access(T, 0, 1);
-
-  double c, s;
-
-  for(int k = 0; k < T.width - 1; k++) {
-    givens(x, z, &c, &s);
-
-    applyGivensLeft(T , k, k+1, c, s);
-    applyGivensRight(T, k, k+1, c, s);
-    
-    if(k < T.width - 2) {
-      x = *access(T, k, k+1);
-      z = *access(T, k, k+2);
-    }
-  }
-}
-
-
-double wilkinsonshift(double a1, double b, double a2) {
-  double d = (a1 - a2) / 2;
-
-  if(d == 0) {
-    if(a2 > 0) {
-      return a2 + abs(b);
-    } else {
-      return a2 - abs(b);
-    }
-  } else {
-    return a2 - b*b / (d * sign(d) * sqrt(d*d + b*b));
-  }
-}
-
 void GKSVDstep(Matrix B, Matrix U, Matrix V) {
   double mu;
 
   int size = B.Xend - B.Xstart + 1;
   int N = size - 1;
-
-  /*if(size > 2) {
-    mu = wilkinsonshift(
-        *access(B, N-1, N-1) * *access(B, N-1, N-1), 
-        *access(B, N-1, N-1) * *access(B, N, N-1),
-        *access(B, N, N) * *access(B, N, N) + *access(B, N, N-1) * *access(B, N, N-1));
-  } else if(size == 2) {
-    mu = wilkinsonshift(
-        *access(B, N-1, N-1) * *access(B, N-1, N-1),
-        *access(B, N-1, N-1) * *access(B, N, N-1),
-        *access(B, N, N) * *access(B, N, N) + *access(B, N, N-1) * *access(B, N, N-1));
-  } else {
-    printf("N < 2\n");
-    exit(1);
-  }*/
 
   double  dm = *access(B, N - 1, N - 1),
           dn = *access(B, N, N),
@@ -468,38 +387,29 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
 
   Matrix sB, sU, sV;
 
-  //int M = U.height;
   int N = V.height;
 
   while(q < N) {
     q = 0;
-    //p = N - 1;
     p = N - 1;
 
     for(int k = N - 2; k >= 0; k--) {
       if( abs(*access(B, k + 1, k)) <= tol * (abs(*access(B, k, k)) * abs(*access(B, k+1, k+1))) ) {
         *access(B, k+1, k) = 0;
         if(q == N - k - 2) {
-          //q = N - k - 1;
           q++;
-          //p = k - 1;
           p--;
         }
       } else {
         if(p == k + 1) {
-          //p = k - 1;
           p--;
         }
       }
-
-      //printf("k: %d, p: %d, q: %d\n", k, p, q);
     }
 
     printf("q : %d, p : %d\n", q, p);
-
     printf("B :\n");
     printMat(B);
-    //for(unsigned long l = 0; l < 1000000000; l++);
 
     if(q == B.width - 1) {
       q = B.width;
@@ -511,9 +421,6 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
         k++;
       }
 
-      printf("k : %d\n", k);
-
-      //if(abs(*access(B, k, k)) < tol) {
       if(k < B.width - q) {
         *access(B, k, k) = 0.;
 
@@ -554,14 +461,6 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
         initSubMatrix(U, &sU, p, N - 1 - q, p, N - 1 - q);
         initSubMatrix(V, &sV, p, N - 1 - q, p, N - 1 - q);
 
-        /*initSubMatrix(B, &sB, 0, B.width-1, p, B.width - 1 - q);
-        initSubMatrix(U, &sU, p, U.width - 1 - q, 0, U.height - 1);
-        initSubMatrix(V, &sV, p, V.width - 1 - q, 0, V.height - 1);*/
-
-        /*initSubMatrix(B, &sB, p, B.width - 1 - q, p, B.height - 1 - q);
-        initSubMatrix(U, &sU, p, U.width - 1 - q, p, U.height - 1 - q);
-        initSubMatrix(V, &sV, p, V.width - 1 - q, p, V.height - 1 - q);*/
-
         GKSVDstep(sB, sU, sV);
 
         printf("B'' : \n");
@@ -583,9 +482,8 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
 }
 
 void SVD(Matrix A, Matrix D, Matrix U, Matrix V) {
-  Matrix B/*, tmp*/;
+  Matrix B;
   initMatrix(&B, A.width, A.height, A.type);
-  //initMatrix(&tmp, A.width, A.height, A.type);
 
   double tol = 0.00001 ;
 
@@ -598,25 +496,6 @@ void SVD(Matrix A, Matrix D, Matrix U, Matrix V) {
   printf("Bidiag V :\n");
   printMat(V);
 
-  
-  /*bidiag_lanczos(A, U, V, tol);
-
-  cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, tmp.height, tmp.width, A.height, 1., access(U, 0, 0), U.height, access(A, 0, 0), A.height, 0., access(tmp, 0, 0), tmp.height);
-  
-  cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, tmp.height, V.width, tmp.width, 1., access(tmp, 0, 0), tmp.height, access(V, 0, 0), V.height, 0., access(B, 0, 0), B.height);
-
-
-  printf("B\n\n");
-  printMat(B);
-  printf("U\n\n");
-  printMat(U);
-  printf("V\n\n");
-  printMat(V);*/
-
-
-  //identity(U);
-  //identity(V);
-
   GKSVD(B, D, U, V, tol);
   
 
@@ -627,12 +506,12 @@ void SVD(Matrix A, Matrix D, Matrix U, Matrix V) {
   printf("GKSVD V :\n");
   printMat(V);
 
-  //free(B.M);
+  free(B.M);
 }
 
 
 int main(int argc, char** argv) {
-  int m = 4, n = 3;
+  int m = atoi(argv[1]), n = atoi(argv[2]);
 
   Matrix A, D, U, V;
   initMatrix(&A, n, m, COL_MAJOR);
@@ -644,8 +523,8 @@ int main(int argc, char** argv) {
 
   for(int i = 0; i < n; i++) {
     for(int j = 0; j < m; j++) {
-      *access(A, i, j) = i+1 + j*n;
       //*access(A, i, j) = rand() % 100;
+      *access(A, i, j) = i + j*n + 1;
     }
   }
 
@@ -653,26 +532,6 @@ int main(int argc, char** argv) {
   printMat(A);
 
   SVD(A, D, U, V);
-
-  /*clearMatrix(D);
-  cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, 5, 5, 5, 1., access(U, 0, 0), U.height, access(A, 0, 0), A.height, 0., access(D, 0, 0), 5);
-
-  clearMatrix(A);
-  cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 5, 5, 5, 1., access(D, 0, 0), D.height, access(V, 0, 0), V.height, 0., access(A, 0, 0), 5);
-
-  printf("UAV\n");
-  printMat(U);
-
-  clearMatrix(A);
-  printf("VtV\n");
-  cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, 5, 5, 5, 1., access(V, 0, 0), D.height, access(V, 0, 0), V.height, 0., access(A, 0, 0), 5);
-  printMat(A);
-
-  clearMatrix(A);
-  printf("UtU\n");
-  cblas_dgemm(CblasColMajor, CblasTrans, CblasNoTrans, 5, 5, 5, 1., access(U, 0, 0), D.height, access(U, 0, 0), V.height, 0., access(A, 0, 0), 5);
-  printMat(A);*/
-
 
   free(A.M);
   free(U.M);
