@@ -3,8 +3,11 @@
 #include <string.h>
 #include <math.h>
 
+#include <time.h>
+
 #include <cblas.h>
 #include <lapacke.h>
+
 
 enum MATRIX_MAJOR {COL_MAJOR, ROW_MAJOR};
 typedef enum MATRIX_MAJOR MATRIX_MAJOR;
@@ -394,7 +397,7 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
     p = N - 1;
 
     for(int k = N - 2; k >= 0; k--) {
-      if( abs(*access(B, k + 1, k)) <= tol * (abs(*access(B, k, k)) * abs(*access(B, k+1, k+1))) ) {
+      if( abs(*access(B, k + 1, k)) <= tol * (abs(*access(B, k, k)) + abs(*access(B, k+1, k+1))) ) {
         *access(B, k+1, k) = 0;
         if(q == N - k - 2) {
           q++;
@@ -421,7 +424,10 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
         k++;
       }
 
+      printf("k : %d\n", k);
+
       if(k < B.width - q) {
+
         *access(B, k, k) = 0.;
 
         if(k < B.width - q - 1) {
@@ -431,16 +437,29 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
           for(int j = k + 1; j < B.width - q - 1; j++) {
             double c, s;
             givens(*access(B, j, j), bulge, &c, &s);
-            *access(B, j, j) = -s * bulge + s * *access(B, j, j);
+            *access(B, j, j) = -s * bulge + c * *access(B, j, j);
             bulge = s * *access(B, j+1, j);
             *access(B, j+1, j) = c * *access(B, j+1, j);
             applyGivensRight(U, k, j, c, s);
           }
         } else {
-          double bulge = *access(B, B.width - q, B.width - q - 1);
+          /*double bulge = *access(B, B.width - q, B.width - q - 1);
           *access(B, B.width - q, B.width - q - 1) = 0;
 
-          for(int j = B.width - q; j > p; j--) {
+          for(int j = B.width - q - 1; j > p; j--) {
+            double c, s;
+            givens(*access(B, j, j), bulge, &c, &s);
+            *access(B, j, j) = c * *access(B, j, j) - s * bulge;
+            if(j > p+1) {
+              bulge = s * *access(B, j, j-1);
+              *access(B, j, j-1) = c * *access(B, j, j-1);
+            }
+            applyGivensRight(V, j, k, c, s);
+          }*/
+	  double bulge = *access(B, B.width - q - 1, B.width - q - 2);
+          *access(B, B.width - q, B.width - q - 2) = 0;
+
+          for(int j = B.width - q - 1; j > p; j--) {
             double c, s;
             givens(*access(B, j, j), bulge, &c, &s);
             *access(B, j, j) = c * *access(B, j, j) - s * bulge;
@@ -451,9 +470,12 @@ void GKSVD(Matrix B, Matrix D, Matrix U, Matrix V, double tol) {
             applyGivensRight(V, j, k, c, s);
           }
         }
+
+	//*access(B, k, k-1) = 0.;
+
+
         printf("B' : \n");
         printMat(B);
-
 
         //*access(B, k+1, k) = 0.;
       } else {
@@ -497,7 +519,6 @@ void SVD(Matrix A, Matrix D, Matrix U, Matrix V) {
   printMat(V);
 
   GKSVD(B, D, U, V, tol);
-  
 
   printf("GKSVD D :\n");
   printMat(D);
@@ -513,25 +534,27 @@ void SVD(Matrix A, Matrix D, Matrix U, Matrix V) {
 int main(int argc, char** argv) {
   int m = atoi(argv[1]), n = atoi(argv[2]);
 
+  srand48(time(NULL));
+
   Matrix A, D, U, V;
   initMatrix(&A, n, m, COL_MAJOR);
   initMatrix(&D, n, m, COL_MAJOR);
   initMatrix(&U, m, m, COL_MAJOR);
   initMatrix(&V, n, n, COL_MAJOR);
 
-  srand(0);
-
   for(int i = 0; i < n; i++) {
-    for(int j = 0; j < m; j++) {
-      //*access(A, i, j) = rand() % 100;
-      *access(A, i, j) = i + j*n + 1;
-    }
-  }
+	  for(int j = 0; j < m; j++) {
+		  //*access(A, i, j) = (rand() % 1000) / 10.0;
+		  *access(A, i, j) = drand48() * 2000 - 1000;
+		  //*access(A, i, j) = i + j*n + 1;
+	  }
+  } 
 
   printf("Input Matrix :\n");
   printMat(A);
 
   SVD(A, D, U, V);
+
 
   free(A.M);
   free(U.M);
